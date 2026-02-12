@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Valentine 💌</title>
+
+<style>
+:root{
+  --pink1:#ffb3d9;
+  --pink2:#ffd1e8;
+  --accent:#ff3b8d;
+  --accent2:#ff6fb5;
+
+  --env:#ffffff;
+  --envShade:#f2e6ee;
+  --envLine:rgba(0,0,0,.15);
+
+  --envH:320px;
+  --envR:18px;
+
+  --letterH:420px;
+  --startIn:420px;
+  --pullOut:650px;
+  --maskTop:220px;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family:system-ui,Segoe UI,Arial;
+  background:
+    radial-gradient(800px 400px at 20% 10%,#fff6,transparent),
+    linear-gradient(135deg,var(--pink1),var(--pink2));
+}
+
+.scene{
+  width:560px;
+  height:420px;
+  position:relative;
+}
+
+/* BACK ENVELOPE */
+.env-back{
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:var(--envH);
+  background:var(--env);
+  border-radius:var(--envR);
+  border:1px solid var(--envLine);
+  box-shadow:0 18px 50px rgba(0,0,0,.2);
+  z-index:1;
+  transition:opacity .6s ease, transform .6s ease;
+}
+
+/* SLOT MASK */
+.slot{
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:var(--envH);
+  overflow:hidden;
+  z-index:2;
+}
+.slot::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:var(--maskTop);
+  background:var(--env);
+  z-index:999;
+}
+
+/* LETTER */
+.letter{
+  position:absolute;
+  left:50%;
+  bottom:28px;
+  width:92%;
+  max-width:520px;
+  height:var(--letterH);
+  background:#fff;
+  border-radius:18px;
+  border:1px solid #0002;
+  box-shadow:0 14px 35px rgba(0,0,0,.18);
+  transform:translateX(-50%) translateY(var(--startIn));
+  transition:transform 1s cubic-bezier(.2,.9,.2,1);
+  z-index:3;
+}
+
+.letter-inner{
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.paper{
+  background:#fff8fb;
+  border-radius:14px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 10px 20px rgba(0,0,0,.12);
+}
+
+.paper h1{margin:0 0 10px;color:var(--accent);}
+.paper p{margin:6px 0;font-weight:600;}
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+}
+
+button{
+  border:none;
+  padding:12px 18px;
+  border-radius:999px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 10px 20px rgba(0,0,0,.15);
+  transition:transform 0.25s ease;
+}
+.yes{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.no{background:#eee;}
+
+/* FRONT ENVELOPE */
+.pocket{
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:var(--envH);
+  border-radius:var(--envR);
+  cursor:pointer;
+  z-index:6;
+  transition:opacity .6s ease, transform .6s ease;
+}
+
+.left,.right,.bottom{
+  position:absolute;
+  background:var(--envShade);
+}
+
+.left{
+  left:-1px; top:0; bottom:0;
+  width:56%;
+  clip-path:polygon(0 0,100% 50%,0 100%);
+  border-right:1px solid var(--envLine);
+}
+
+.right{
+  right:-1px; top:0; bottom:0;
+  width:56%;
+  clip-path:polygon(100% 0,0 50%,100% 100%);
+  border-left:1px solid var(--envLine);
+}
+
+.bottom{
+  left:0; right:0; bottom:-1px;
+  height:64%;
+  clip-path:polygon(0 100%,50% 45%,100% 100%);
+  border-top:1px solid var(--envLine);
+  background:var(--env);
+}
+
+/* FLAP */
+.flap{
+  position:absolute;
+  top:-1px; left:-1px; right:-1px;
+  height:62%;
+  background:var(--env);
+  clip-path:polygon(0 0,100% 0,50% 75%);
+  transform-origin:top;
+  transition:.9s;
+  z-index:8;
+}
+
+/* HEART */
+.seal{
+  position:absolute;
+  bottom:90px; left:50%;
+  width:64px; height:64px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  transform:translateX(-50%) rotate(45deg);
+  border-radius:18px;
+  z-index:9;
+}
+
+/* OPEN */
+.scene.open .flap{transform:rotateX(180deg);}
+.scene.open .slot{overflow:visible;}
+.scene.open .letter{
+  transform:translateX(-50%) translateY(calc(var(--startIn) - var(--pullOut)));
+  z-index:20;
+}
+
+/* ENVELOPE DISAPPEAR (ONLY envelope) */
+.scene.open .pocket,
+.scene.open .env-back{
+  opacity:0;
+  transform:translateY(80px);
+  pointer-events:none;
+}
+
+/* MESSAGE */
+.message{
+  text-align:center;
+  font-size:22px;
+  font-weight:900;
+  color:var(--accent);
+  margin-top:10px;
+  min-height:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="scene" id="scene">
+
+  <div class="env-back" id="envBack"></div>
+
+  <div class="slot">
+    <div class="letter">
+      <div class="letter-inner">
+        <div class="paper">
+          <h1>Virtual Valentines Date</h1>
+          <p>Time 6pm – mountain time / 8pm eastern time</p>
+          <p>Join me for a night of food, fun, and romance!</p>
+          <p><strong>Happy Valentines Day</strong></p>
+        </div>
+
+        <div class="actions">
+          <button class="yes" id="yesBtn">Yes 💖</button>
+          <button class="no" id="noBtn">No 🙃</button>
+        </div>
+
+        <div class="message" id="msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pocket" id="envelope">
+    <div class="left"></div>
+    <div class="right"></div>
+    <div class="bottom"></div>
+    <div class="flap"></div>
+    <div class="seal"></div>
+  </div>
+
+</div>
+
+<script>
+const scene = document.getElementById("scene");
+const envelope = document.getElementById("envelope");
+const envBack = document.getElementById("envBack");
+
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const msg = document.getElementById("msg");
+
+let yesScale = 1;
+let noScale = 1;
+let sureCount = 0;
+
+envelope.onclick = () => {
+  scene.classList.add("open");
+
+  // Remove envelope completely after fade so it doesn't block clicks
+  setTimeout(() => {
+    envelope.style.display = "none";
+    envBack.style.display = "none";
+  }, 700);
+};
+
+yesBtn.onclick = () => {
+  msg.textContent = "Yayyy see you then 💖";
+};
+
+noBtn.onclick = () => {
+  yesScale += 0.25;
+  noScale -= 0.15;
+  if(noScale < 0.2) noScale = 0.2;
+
+  yesBtn.style.transform = `scale(${yesScale})`;
+  noBtn.style.transform = `scale(${noScale})`;
+
+  sureCount++;
+
+  msg.textContent = "Are you " + "sure ".repeat(sureCount).trim() + "? 😭";
+};
+</script>
+
+</body>
+</html>
